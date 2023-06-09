@@ -6,10 +6,11 @@ import {
   updateSamples,
   progress,
 } from "./worker.js";
+import { writeHeapSnapshot } from "v8";
 
 async function runDailyJob(co, dayno) {
-  const nMsgsPerDay = 3 * 1000 * 1000;
-  const nMsgsPerWorker = 100 * 1000;
+  const nMsgsPerDay = 3_000_000;
+  const nMsgsPerWorker = 100_000;
   let workers = [];
 
   const timeStart = new Date();
@@ -66,6 +67,8 @@ async function run(args) {
   const co = cli.db(DB).collection(CO);
   let prevLast = new Date();
   for (let d = 1; d <= nDays; d++) {
+    writeHeapSnapshot();
+
     const starttm = new Date();
     await runDailyJob(co, d);
 
